@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>스마트스토어 계산기</title>
+  <style>
+    body { font-family: sans-serif; background: #fff; padding: 20px; }
+    table { border-collapse: collapse; width: 100%; max-width: 600px; margin: auto; }
+    th, td { border: 1px solid #000; padding: 8px; text-align: center; }
+    th { background-color: yellow; }
+    .bg-blue { background-color: #00b0f0; color: white; font-weight: bold; }
+    .bg-green { background-color: #00b050; color: white; font-weight: bold; }
+    .bg-red { background-color: red; color: white; font-weight: bold; }
+    .bg-yellow { background-color: #ffff00; font-weight: bold; }
+    .highlight { color: red; font-weight: bold; }
+    input { width: 80px; text-align: right; }
+  </style>
+</head>
+<body>
+  <h2 style="text-align:center">스마트 스토어 계산기</h2>
+  <table>
+    <tr>
+      <th>구분</th>
+      <th>최저(포함)</th>
+      <th>마진</th>
+      <th>본사(별도)</th>
+    </tr>
+    <tr>
+      <td class="bg-blue">공급가액</td>
+      <td><input type="number" id="price" value="12000" /></td>
+      <td></td>
+      <td><input type="number" id="cost" value="10000" /></td>
+    </tr>
+    <tr>
+      <td class="bg-green">소계(공식)</td>
+      <td><input type="text" id="subtotal" readonly /></td>
+      <td></td>
+      <td><input type="text" id="subtotalCost" readonly /></td>
+    </tr>
+    <tr>
+      <td class="bg-red">수수료(공식)</td>
+      <td>
+        <input type="number" id="feeRate" value="5" style="width:50px;" />% -
+        <input type="text" id="feeAmount" readonly style="width:60px;" />
+      </td>
+      <td></td>
+      <td>0.0% -</td>
+    </tr>
+    <tr>
+      <td class="bg-yellow">최종차액(공식)</td>
+      <td><input type="text" id="finalAmount" readonly /></td>
+      <td><input type="text" id="margin" readonly /></td>
+      <td><input type="text" id="finalCost" readonly /></td>
+    </tr>
+    <tr>
+      <td class="bg-yellow">마진율(공식)</td>
+      <td></td>
+      <td colspan="2"><input type="text" id="marginRate" class="highlight" readonly style="text-align:center; width: 80px;" /></td>
+    </tr>
+  </table>
+
+  <script>
+    function calculate() {
+      const price = parseFloat(document.getElementById('price').value) || 0;
+      const cost = parseFloat(document.getElementById('cost').value) || 0;
+      const feeRate = parseFloat(document.getElementById('feeRate').value) || 0;
+
+      const subtotal = price;
+      const fee = Math.floor(subtotal * (feeRate / 100));
+      const finalAmount = subtotal - fee;
+      const finalCost = cost * 1.1;
+      const margin = finalAmount - finalCost;
+      const rawMarginRate = finalCost > 0 ? (margin / finalCost) * 100 : 0;
+      const marginRate = Math.round(rawMarginRate * 100) / 100; // 소수 둘째 자리 반올림
+
+      document.getElementById('subtotal').value = subtotal.toLocaleString();
+      document.getElementById('subtotalCost').value = finalCost.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+      document.getElementById('feeAmount').value = fee.toLocaleString();
+      document.getElementById('finalAmount').value = finalAmount.toLocaleString();
+      document.getElementById('finalCost').value = finalCost.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+      document.getElementById('margin').value = margin.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+      document.getElementById('marginRate').value = marginRate.toFixed(2) + '%';
+    }
+
+    document.querySelectorAll('input').forEach(input => {
+      input.addEventListener('input', calculate);
+    });
+
+    calculate();
+  </script>
+</body>
+</html>
